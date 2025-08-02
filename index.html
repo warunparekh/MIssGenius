@@ -3,35 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Universe for Himani</title>
+    <title>For Himani</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Quicksand:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Quicksand:wght@300;400&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --font-serif: 'Cormorant Garamond', serif;
             --font-sans: 'Quicksand', sans-serif;
-            --color-bg: #00000a;
-            --color-text: #e0e0e0;
-            --color-glow: #a77cff;
-            --color-accent: #ffb7c5;
+            --color-bg: #01000a;
+            --color-text: #e8e0ff;
+            --color-glow-primary: #a77cff;
+            --color-glow-secondary: #ffb7c5;
+            --color-accent: #f7d8ff;
         }
-        body {
+        body, html {
             margin: 0;
             overflow: hidden;
             background-color: var(--color-bg);
             color: var(--color-text);
             font-family: var(--font-sans);
+            width: 100%;
+            height: 100%;
         }
-        canvas {
-            display: block;
+        #scene-container {
             position: fixed;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 1;
+            cursor: grab;
         }
-        #ui-container {
+        #scene-container:active {
+            cursor: grabbing;
+        }
+        #ui-layer {
             position: fixed;
             top: 0;
             left: 0;
@@ -40,46 +48,53 @@
             pointer-events: none;
             z-index: 10;
         }
-        .message-box {
+        .modal {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 10, 0.8);
-            border: 1px solid var(--color-glow);
+            transform: translate(-50%, -50%) scale(0.95);
+            background: rgba(10, 5, 20, 0.75);
+            border: 1px solid var(--color-glow-primary);
             border-radius: 15px;
-            padding: 2rem;
-            max-width: 400px;
+            padding: 2.5rem;
+            max-width: 90%;
+            width: 500px;
             text-align: center;
             opacity: 0;
-            transition: opacity 0.5s ease;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 0 30px var(--color-glow);
-            font-family: var(--font-serif);
-            font-size: 1.5rem;
-            line-height: 1.6;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 40px rgba(167, 124, 255, 0.5);
+            pointer-events: none;
         }
-        .message-box.visible {
+        .modal.visible {
             opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
             pointer-events: all;
+        }
+        .modal-content h2 {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            margin-top: 0;
+            color: var(--color-accent);
+            text-shadow: 0 0 10px var(--color-accent);
+        }
+        .modal-content p {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            line-height: 1.7;
+            text-align: left;
         }
         .close-button {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 1.5rem;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
             cursor: pointer;
             color: var(--color-text);
+            transition: transform 0.3s;
         }
-        .constellation-label {
-            position: absolute;
-            color: var(--color-accent);
-            font-family: var(--font-serif);
-            font-size: 1.2rem;
-            text-shadow: 0 0 8px var(--color-accent);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
+        .close-button:hover {
+            transform: scale(1.2);
         }
         #loading-screen {
             position: fixed;
@@ -93,32 +108,48 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            transition: opacity 1s ease 1s;
+            transition: opacity 1.5s ease 1s;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--color-glow-primary);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 2rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         #loading-screen h1 {
             font-family: var(--font-serif);
             font-size: 2.5rem;
             color: var(--color-text);
-            opacity: 0;
-            animation: fadeIn 2s forwards;
         }
-        #loading-screen p {
-             font-family: var(--font-sans);
-             font-size: 1rem;
-             color: var(--color-text);
-             opacity: 0;
-             animation: fadeIn 2s 1s forwards;
-        }
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-        #wish-container {
+        #instruction-panel {
             position: absolute;
             bottom: 20px;
-            right: 20px;
-            z-index: 20;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background: rgba(10, 5, 20, 0.75);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 1s ease 2s;
         }
-        #wish-button {
+        #instruction-panel.visible {
+            opacity: 1;
+        }
+        #letter-button-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 20;
+            pointer-events: all;
+        }
+        .celestial-button {
             background: none;
             border: 1px solid var(--color-accent);
             color: var(--color-accent);
@@ -126,244 +157,348 @@
             padding: 10px 20px;
             border-radius: 20px;
             cursor: pointer;
-            transition: background 0.3s, color 0.3s;
-            pointer-events: all;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px var(--color-accent);
         }
-        #wish-button:hover {
+        .celestial-button:hover {
             background: var(--color-accent);
             color: var(--color-bg);
+            box-shadow: 0 0 15px var(--color-accent);
         }
-        #wish-modal {
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            gap: 1rem;
+        #letter-modal .modal-content {
+            max-height: 70vh;
+            overflow-y: auto;
         }
-        #wish-modal textarea {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid var(--color-glow);
-            color: var(--color-text);
-            border-radius: 8px;
-            padding: 10px;
-            font-family: var(--font-sans);
-            width: 100%;
-            height: 100px;
-            resize: none;
-        }
-        #wish-modal button {
-            background: var(--color-accent);
-            border: none;
-            color: var(--color-bg);
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
+        #constellation-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s;
+            text-shadow: 0 0 10px var(--color-glow-secondary);
         }
     </style>
 </head>
 <body>
     <div id="loading-screen">
-        <h1>For Himani</h1>
-        <p>A universe of thoughts from Warun</p>
+        <div class="spinner"></div>
+        <h1>Building a Universe for Himani...</h1>
     </div>
 
-    <canvas id="bg"></canvas>
+    <div id="scene-container"></div>
 
-    <div id="ui-container">
-        <div id="message-box" class="message-box">
-            <span id="close-button" class="close-button">&times;</span>
-            <p id="message-content"></p>
+    <div id="ui-layer">
+        <div id="letter-button-container">
+            <button id="open-letter-button" class="celestial-button">A Letter for You</button>
+        </div>
+
+        <div id="instruction-panel">
+            <p>Click and drag to look around. Discover the glowing motes.</p>
+        </div>
+
+        <div id="message-modal" class="modal">
+            <span class="close-button" data-modal-id="message-modal">&times;</span>
+            <div class="modal-content">
+                <p id="message-content"></p>
+            </div>
+        </div>
+
+        <div id="letter-modal" class="modal">
+            <span class="close-button" data-modal-id="letter-modal">&times;</span>
+            <div class="modal-content">
+                <h2>My Dearest Himani,</h2>
+                <p>I'm writing this because words have failed me in person. I need you to know how truly and deeply sorry I am. For my thoughtlessness, for my insecurity, for any moment I made you feel anything less than the incredible person you are—I was wrong. There are no excuses for my actions, only the promise that I am learning from them. It was my failing, not yours, and I hope one day you can forgive me.</p>
+                <p>This little universe is my attempt to show you what I can't always say. Every star, every light, is a thought about you. My entire existence is drawn to you, like a planet to its sun. Every time I breathe, every heartbeat of mine... it's all for you.</p>
+                <p>I see your future shining so brightly, and I want you to know I'll always be there, cheering you on. To your dream university, to your dream career, and to every success you will have—I will be there, holding your hand in spirit, and watching you achieve everything you've ever wanted.</p>
+                <p>With all my heart,<br>- Warun</p>
+            </div>
         </div>
         
-        <div id="wish-container">
-            <button id="wish-button">Make a Wish</button>
+        <div id="constellation-prompt">
+            <p>Connect the pink stars to reveal a final promise.</p>
         </div>
 
-        <div id="wish-modal" class="message-box">
-            <span id="close-wish-modal" class="close-button">&times;</span>
-            <h2>Write a Wish for Her Future</h2>
-            <textarea id="wish-input" placeholder="e.g., I wish you find all the happiness you deserve..."></textarea>
-            <button id="submit-wish">Add to the Stars</button>
+        <div id="final-message-modal" class="modal">
+             <span class="close-button" data-modal-id="final-message-modal">&times;</span>
+            <div class="modal-content">
+                <h2>A Promise</h2>
+                <p>No matter where your journey takes you, my support will be a constant constellation in your sky. I will always be here, rooting for you. And I will wait.</p>
+            </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Scene Setup ---
+            // --- SCENE SETUP ---
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true });
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.position.z = 50;
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('scene-container').appendChild(renderer.domElement);
+            camera.position.z = 100;
 
-            // --- UI Elements ---
-            const messageBox = document.getElementById('message-box');
-            const messageContent = document.getElementById('message-content');
-            const closeButton = document.getElementById('close-button');
-            const wishButton = document.getElementById('wish-button');
-            const wishModal = document.getElementById('wish-modal');
-            const closeWishModal = document.getElementById('close-wish-modal');
-            const wishInput = document.getElementById('wish-input');
-            const submitWish = document.getElementById('submit-wish');
-            
-            // --- Star Creation ---
-            const starGeometry = new THREE.BufferGeometry();
-            const starVertices = [];
-            for (let i = 0; i < 10000; i++) {
-                const x = (Math.random() - 0.5) * 2000;
-                const y = (Math.random() - 0.5) * 2000;
-                const z = (Math.random() - 0.5) * 2000;
-                starVertices.push(x, y, z);
-            }
-            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-            const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
-            const stars = new THREE.Points(starGeometry, starMaterial);
-            scene.add(stars);
-
-            // --- Interactive Constellations ---
-            const interactiveObjects = [];
-            const constellationGroup = new THREE.Group();
-            scene.add(constellationGroup);
-
-            const constellations = {
-                apology: {
-                    name: "The Apology",
-                    center: new THREE.Vector3(-30, 10, 0),
-                    stars: [
-                        { pos: new THREE.Vector3(0, 0, 0), msg: "I was wrong, Himani. For my thoughtlessness, I am truly sorry." },
-                        { pos: new THREE.Vector3(2, 2, 0), msg: "My insecurity spoke for me, and I deeply regret the words it chose." },
-                        { pos: new THREE.Vector3(-2, 3, 0), msg: "There are no excuses, only my sincere promise to be better." }
-                    ]
-                },
-                declaration: {
-                    name: "The Declaration",
-                    center: new THREE.Vector3(30, 15, 0),
-                    stars: [
-                        { pos: new THREE.Vector3(0, 0, 0), msg: "My eyes are only for you." },
-                        { pos: new THREE.Vector3(-3, -2, 0), msg: "Every heartbeat of mine thinks about you." },
-                        { pos: new THREE.Vector3(1, -4, 0), msg: "My entire existence is drawn to you, like a star to the center of its galaxy." }
-                    ]
-                },
-                promise: {
-                    name: "The Promise",
-                    center: new THREE.Vector3(0, -20, 0),
-                    stars: [
-                        { pos: new THREE.Vector3(0, 0, 0), msg: "Whatever path you choose..." },
-                        { pos: new THREE.Vector3(3, 1, 0), msg: "...to your dream university and your dream career..." },
-                        { pos: new THREE.Vector3(6, 0, 0), msg: "...I will always be there, rooting for you and holding your hand." }
-                    ]
-                }
+            // --- UI ELEMENTS ---
+            const modals = {
+                message: document.getElementById('message-modal'),
+                letter: document.getElementById('letter-modal'),
+                final: document.getElementById('final-message-modal'),
             };
+            const messageContent = document.getElementById('message-content');
+            const instructionPanel = document.getElementById('instruction-panel');
+            const constellationPrompt = document.getElementById('constellation-prompt');
 
-            const starTexture = new THREE.TextureLoader().load('https://placehold.co/32x32/ffffff/ffffff.png');
-            Object.values(constellations).forEach(c => {
-                c.stars.forEach(s => {
-                    const starSpriteMaterial = new THREE.SpriteMaterial({ map: starTexture, color: 0xa77cff, transparent: true, opacity: 0.8, sizeAttenuation: true });
-                    const starSprite = new THREE.Sprite(starSpriteMaterial);
-                    starSprite.position.copy(c.center).add(s.pos);
-                    starSprite.scale.set(2, 2, 1);
-                    starSprite.userData.message = s.msg;
-                    starSprite.userData.isInteractive = true;
-                    constellationGroup.add(starSprite);
-                    interactiveObjects.push(starSprite);
-                });
+            // --- INTERACTIVE OBJECTS ---
+            const interactiveMotes = [];
+            const promiseStars = [];
+            let activeLine = null;
+            let connectedStars = new Set();
+            const constellationLines = new THREE.Group();
+            scene.add(constellationLines);
+            
+            // --- SOUND SETUP ---
+            let heartbeat;
+            const soundReady = new Promise(resolve => {
+                heartbeat = new Tone.Player({
+                    url: "https://storage.googleapis.com/gemini-prod-us-west1-assets/2024/07/26/heartbeat.mp3",
+                    loop: true,
+                    autostart: true,
+                    volume: -20,
+                    playbackRate: 0.5,
+                    onload: resolve,
+                }).toDestination();
             });
 
-            // --- Raycasting for Interactivity ---
+            // --- PARTICLE NEBULA ---
+            const particleCount = 20000;
+            const positions = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3 + 0] = (Math.random() * 2 - 1) * 1000;
+                positions[i * 3 + 1] = (Math.random() * 2 - 1) * 1000;
+                positions[i * 3 + 2] = (Math.random() * 2 - 1) * 1000;
+            }
+            const particleGeometry = new THREE.BufferGeometry();
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMaterial = new THREE.PointsMaterial({
+                color: 0xaaaaff,
+                size: 0.25,
+                transparent: true,
+                opacity: 0.5,
+                blending: THREE.AdditiveBlending
+            });
+            const nebula = new THREE.Points(particleGeometry, particleMaterial);
+            scene.add(nebula);
+
+            // --- MEMORY MOTES ---
+            const moteTexture = new THREE.TextureLoader().load('https://placehold.co/64x64/a77cff/a77cff.png');
+            const moteMessages = [
+                "My eyes are only for you.",
+                "Every heartbeat of mine thinks about you.",
+                "My entire existence is drawn to you.",
+                "I admire your strength more than you know.",
+                "Your laughter is my favorite sound.",
+                "I believe in your dreams completely."
+            ];
+            for (let i = 0; i < moteMessages.length; i++) {
+                const material = new THREE.SpriteMaterial({ map: moteTexture, color: 0xa77cff, transparent: true, blending: THREE.AdditiveBlending });
+                const mote = new THREE.Sprite(material);
+                const angle = (i / moteMessages.length) * Math.PI * 2;
+                const radius = 60 + Math.random() * 20;
+                mote.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius * 0.5, (Math.random() - 0.5) * 30);
+                mote.scale.set(4, 4, 4);
+                mote.userData = { type: 'mote', message: moteMessages[i] };
+                scene.add(mote);
+                interactiveMotes.push(mote);
+            }
+
+            // --- PROMISE STARS (for constellation drawing) ---
+            const promiseStarTexture = new THREE.TextureLoader().load('https://placehold.co/64x64/ffb7c5/ffb7c5.png');
+            const promiseStarPositions = [
+                new THREE.Vector3(-40, -30, -10),
+                new THREE.Vector3(0, -50, 0),
+                new THREE.Vector3(40, -30, 10),
+                new THREE.Vector3(0, -10, -5)
+            ];
+            promiseStarPositions.forEach((pos, i) => {
+                const material = new THREE.SpriteMaterial({ map: promiseStarTexture, color: 0xffb7c5, transparent: true, blending: THREE.AdditiveBlending });
+                const star = new THREE.Sprite(material);
+                star.position.copy(pos);
+                star.scale.set(0, 0, 0); // Initially hidden
+                star.userData = { type: 'promise_star', id: i };
+                scene.add(star);
+                promiseStars.push(star);
+            });
+
+            // --- CONTROLS ---
+            let isMouseDown = false;
+            let lastMouseX = 0, lastMouseY = 0;
+            const cameraGroup = new THREE.Group();
+            cameraGroup.add(camera);
+            scene.add(cameraGroup);
+
+            renderer.domElement.addEventListener('mousedown', e => { isMouseDown = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
+            renderer.domElement.addEventListener('mouseup', () => isMouseDown = false);
+            renderer.domElement.addEventListener('mousemove', e => {
+                if (!isMouseDown) return;
+                const deltaX = e.clientX - lastMouseX;
+                const deltaY = e.clientY - lastMouseY;
+                cameraGroup.rotation.y += deltaX * 0.002;
+                cameraGroup.rotation.x += deltaY * 0.002;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+            });
+
+            // --- RAYCASTING & INTERACTION ---
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
 
-            function onMouseMove(event) {
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            }
-            window.addEventListener('mousemove', onMouseMove, false);
-
-            function onMouseClick(event) {
+            renderer.domElement.addEventListener('click', e => {
+                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
                 raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(interactiveObjects);
-                if (intersects.length > 0) {
-                    const obj = intersects[0].object;
-                    if (obj.userData.isInteractive && obj.userData.message) {
-                        messageContent.textContent = obj.userData.message;
-                        messageBox.classList.add('visible');
+
+                const moteIntersects = raycaster.intersectObjects(interactiveMotes);
+                if (moteIntersects.length > 0) {
+                    messageContent.textContent = moteIntersects[0].object.userData.message;
+                    modals.message.classList.add('visible');
+                    return;
+                }
+
+                const promiseStarIntersects = raycaster.intersectObjects(promiseStars.filter(s => s.scale.x > 0));
+                if (promiseStarIntersects.length > 0) {
+                    handlePromiseStarClick(promiseStarIntersects[0].object);
+                }
+            });
+
+            function handlePromiseStarClick(star) {
+                if (connectedStars.has(star.userData.id) || (activeLine && connectedStars.size === 0)) return;
+
+                if (!activeLine) {
+                    connectedStars.add(star.userData.id);
+                    const points = [star.position.clone(), star.position.clone()];
+                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const material = new THREE.LineBasicMaterial({ color: 0xffb7c5, transparent: true, opacity: 0.7 });
+                    activeLine = new THREE.Line(geometry, material);
+                    constellationLines.add(activeLine);
+                } else {
+                    const lastStarPos = activeLine.geometry.attributes.position.getXYZ(connectedStars.size - 1);
+                    const newLinePoints = [lastStarPos, star.position.clone()];
+                    const newLineGeo = new THREE.BufferGeometry().setFromPoints(newLinePoints);
+                    const newLine = new THREE.Line(newLineGeo, activeLine.material);
+                    constellationLines.add(newLine);
+
+                    connectedStars.add(star.userData.id);
+                    activeLine.geometry.attributes.position.setXYZ(connectedStars.size - 1, star.position.x, star.position.y, star.position.z);
+                    activeLine.geometry.attributes.position.needsUpdate = true;
+
+                    if (connectedStars.size === promiseStars.length) {
+                        // Connect back to start
+                        const firstStarPos = promiseStars.find(s => s.userData.id === Array.from(connectedStars)[0]).position;
+                        const finalLinePoints = [star.position.clone(), firstStarPos];
+                        const finalLineGeo = new THREE.BufferGeometry().setFromPoints(finalLinePoints);
+                        const finalLine = new THREE.Line(finalLineGeo, activeLine.material);
+                        constellationLines.add(finalLine);
                         
-                        // Zoom to star
-                        new TWEEN.Tween(camera.position)
-                            .to({ x: obj.position.x, y: obj.position.y, z: obj.position.z + 10 }, 1000)
-                            .easing(TWEEN.Easing.Quadratic.InOut)
-                            .start();
+                        // Trigger final message
+                        setTimeout(() => modals.final.classList.add('visible'), 1000);
+                        constellationPrompt.style.opacity = '0';
                     }
                 }
             }
-            window.addEventListener('click', onMouseClick, false);
 
-            // --- UI Logic ---
-            closeButton.addEventListener('click', () => {
-                messageBox.classList.remove('visible');
-                // Zoom back out
-                new TWEEN.Tween(camera.position)
-                    .to({ x: 0, y: 0, z: 50 }, 1000)
-                    .easing(TWEEN.Easing.Quadratic.InOut)
-                    .start();
+
+            // --- UI LOGIC ---
+            document.getElementById('open-letter-button').addEventListener('click', () => modals.letter.classList.add('visible'));
+            document.querySelectorAll('.close-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    modals[btn.dataset.modalId].classList.remove('visible');
+                });
             });
 
-            wishButton.addEventListener('click', () => {
-                wishModal.style.display = 'flex';
-                wishModal.classList.add('visible');
-            });
-
-            closeWishModal.addEventListener('click', () => {
-                wishModal.classList.remove('visible');
-                setTimeout(() => wishModal.style.display = 'none', 500);
-            });
-            
-            submitWish.addEventListener('click', () => {
-                const wishText = wishInput.value;
-                if (wishText) {
-                    // Create a new star for the wish
-                    const wishStarMaterial = new THREE.SpriteMaterial({ map: starTexture, color: 0xffb7c5, transparent: true, opacity: 1 });
-                    const wishStar = new THREE.Sprite(wishStarMaterial);
-                    wishStar.position.set(Math.random() * 20 - 10, -10 + Math.random() * 5, 0);
-                    wishStar.scale.set(2.5, 2.5, 1);
-                    wishStar.userData.message = `Warun's wish for you: "${wishText}"`;
-                    wishStar.userData.isInteractive = true;
-                    constellationGroup.add(wishStar);
-                    interactiveObjects.push(wishStar);
-                    
-                    // Animate the wish star
-                    wishStar.scale.set(0,0,0);
-                    new TWEEN.Tween(wishStar.scale)
-                        .to({x: 2.5, y: 2.5, z: 1}, 2000)
+            // --- GAME LOGIC & SEQUENCING ---
+            function startConstellationChallenge() {
+                instructionPanel.style.opacity = '0';
+                setTimeout(() => constellationPrompt.style.opacity = '1', 1000);
+                promiseStars.forEach((star, i) => {
+                    new TWEEN.Tween(star.scale)
+                        .to({ x: 5, y: 5, z: 5 }, 2000)
+                        .delay(i * 200)
                         .easing(TWEEN.Easing.Elastic.Out)
                         .start();
+                });
+            }
 
-                    closeWishModal.click();
-                    wishInput.value = '';
-                    wishButton.style.display = 'none'; // Only one wish
+            let motesFound = 0;
+            modals.message.addEventListener('transitionend', e => {
+                if (e.propertyName === 'opacity' && !modals.message.classList.contains('visible')) {
+                    motesFound++;
+                    if (motesFound >= 3) { // Trigger after finding 3 motes
+                        startConstellationChallenge();
+                        motesFound = -1000; // Prevent re-triggering
+                    }
                 }
             });
 
-            // --- Animation Loop ---
+            // --- ANIMATION LOOP ---
+            const clock = new THREE.Clock();
             function animate() {
                 requestAnimationFrame(animate);
+                const delta = clock.getDelta();
                 TWEEN.update();
-                stars.rotation.y += 0.0001;
-                constellationGroup.rotation.y += 0.0002;
+
+                nebula.rotation.y += delta * 0.01;
+                interactiveMotes.forEach(mote => mote.rotation.y += delta * 0.1);
+
+                // Heartbeat sound logic
+                if (heartbeat && heartbeat.loaded) {
+                    let minDist = Infinity;
+                    interactiveMotes.forEach(mote => {
+                        const dist = camera.position.distanceTo(mote.position);
+                        if (dist < minDist) minDist = dist;
+                    });
+                    const rate = THREE.MathUtils.lerp(1.2, 0.6, Math.min(minDist / 80, 1));
+                    heartbeat.playbackRate = Tone.Transport.bpm.rampTo(rate * 120, 0.1);
+                }
+                
+                // Update active constellation line
+                if(activeLine) {
+                    const worldMouse = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+                    worldMouse.unproject(camera);
+                    const dir = worldMouse.sub(camera.position).normalize();
+                    const distance = -camera.position.z / dir.z;
+                    const pos = camera.position.clone().add(dir.multiplyScalar(distance));
+
+                    const positions = activeLine.geometry.attributes.position.array;
+                    positions[positions.length - 3] = pos.x;
+                    positions[positions.length - 2] = pos.y;
+                    positions[positions.length - 1] = pos.z;
+                    activeLine.geometry.attributes.position.needsUpdate = true;
+                }
+
                 renderer.render(scene, camera);
             }
-            
-            // --- Initial Load ---
-            const loadingScreen = document.getElementById('loading-screen');
-            loadingScreen.addEventListener('transitionend', () => {
-                loadingScreen.style.display = 'none';
-            });
+
+            // --- INITIAL LOAD ---
             window.onload = () => {
+                const loadingScreen = document.getElementById('loading-screen');
                 loadingScreen.style.opacity = '0';
+                loadingScreen.addEventListener('transitionend', () => {
+                    loadingScreen.style.display = 'none';
+                    instructionPanel.classList.add('visible');
+                    soundReady.then(() => Tone.start());
+                });
                 animate();
             };
 
-            // --- Resize Handling ---
+            // --- RESIZE HANDLING ---
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
