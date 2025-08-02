@@ -605,7 +605,38 @@
             }
 
             function handlePromiseStarClick(star) {
-                // ... (constellation drawing logic remains the same)
+                if (connectedStars.has(star.userData.id) || (activeLine && connectedStars.size === 0)) return;
+
+                if (!activeLine) {
+                    connectedStars.add(star.userData.id);
+                    const points = [star.position.clone(), star.position.clone()];
+                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const material = new THREE.LineBasicMaterial({ color: 0xffb7c5, transparent: true, opacity: 0.7 });
+                    activeLine = new THREE.Line(geometry, material);
+                    constellationLines.add(activeLine);
+                } else {
+                    const lastStarPos = promiseStars.find(s => s.userData.id === Array.from(connectedStars).pop()).position;
+                    const newLinePoints = [lastStarPos, star.position.clone()];
+                    const newLineGeo = new THREE.BufferGeometry().setFromPoints(newLinePoints);
+                    const newLine = new THREE.Line(newLineGeo, activeLine.material);
+                    constellationLines.add(newLine);
+
+                    connectedStars.add(star.userData.id);
+                    
+                    if (connectedStars.size === promiseStars.length) {
+                        const firstStarPos = promiseStars.find(s => s.userData.id === Array.from(connectedStars)[0]).position;
+                        const finalLinePoints = [star.position.clone(), firstStarPos];
+                        const finalLineGeo = new THREE.BufferGeometry().setFromPoints(finalLinePoints);
+                        const finalLine = new THREE.Line(finalLineGeo, activeLine.material);
+                        constellationLines.add(finalLine);
+                        
+                        scene.remove(activeLine);
+                        activeLine = null;
+                        
+                        setTimeout(() => modals.final.classList.add('visible'), 1000);
+                        constellationPrompt.style.opacity = '0';
+                    }
+                }
             }
 
             function setupUIListeners() {
@@ -627,8 +658,9 @@
                 });
 
                 document.querySelectorAll('.close-button').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                         modals[btn.dataset.modalId].classList.remove('visible');
+                    btn.addEventListener('click', (e) => {
+                         const modalId = e.currentTarget.dataset.modalId;
+                         modals[modalId].classList.remove('visible');
                     });
                 });
                 
@@ -715,7 +747,19 @@
             }
 
             function updateActiveLine() {
-                 // ... (constellation line drawing logic remains the same)
+                if(activeLine) {
+                    const worldMouse = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+                    worldMouse.unproject(camera);
+                    const dir = worldMouse.sub(camera.position).normalize();
+                    const distance = -camera.position.z / dir.z;
+                    const pos = camera.position.clone().add(dir.multiplyScalar(distance));
+
+                    const positions = activeLine.geometry.attributes.position.array;
+                    positions[positions.length - 3] = pos.x;
+                    positions[positions.length - 2] = pos.y;
+                    positions[positions.length - 1] = pos.z;
+                    activeLine.geometry.attributes.position.needsUpdate = true;
+                }
             }
 
             // --- INITIAL LOAD ---
