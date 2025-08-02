@@ -3,439 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Message for Himani</title>
-    <!-- Google Fonts for typography -->
+    <title>A Universe for Himani</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Quicksand:wght@300;400&display=swap" rel="stylesheet">
     
     <style>
-        /* --- Global Styles & Variables --- */
         :root {
-            --color-act1-bg: #2c3e50; /* Deep Slate Grey */
-            --color-act2-bg: #34495e; /* Deep Navy Blue */
-            --color-act3-bg: #ecf0f1; /* Soft Grey/Cloud */
-            --color-text-light: #ecf0f1;
-            --color-text-dark: #2c3e50;
-            --color-accent: #f1c40f; /* Muted Gold/Sunflower */
-            --font-serif: 'Lora', serif;
-            --font-sans: 'Lato', sans-serif;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Quicksand', sans-serif;
+            --color-bg: #00000a;
+            --color-text: #e0e0e0;
+            --color-glow: #a77cff;
+            --color-accent: #ffb7c5;
         }
-
-        /* --- Base Setup --- */
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
             margin: 0;
+            overflow: hidden;
+            background-color: var(--color-bg);
+            color: var(--color-text);
             font-family: var(--font-sans);
-            color: var(--color-text-light);
-            background-color: var(--color-act1-bg);
-            transition: background-color 1.5s ease-in-out;
-            overflow-x: hidden;
-            /* Adding a subtle gradient for depth */
-            background-image: radial-gradient(circle, transparent, rgba(0,0,0,0.3));
         }
-
-        /* --- Visual Metaphor: The Persistent Light --- */
-        #persistent-light {
+        canvas {
+            display: block;
             position: fixed;
-            top: 0; 
-            left: 0;
-            width: 10px;
-            height: 10px;
-            background-color: var(--color-accent);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0;
-            /* Using box-shadow for a softer, more performant glow */
-            box-shadow: 0 0 20px 8px var(--color-accent);
-            transition: opacity 0.5s, box-shadow 0.5s, background-color 1.5s;
-            will-change: transform;
-        }
-
-        /* --- Layout & Sections --- */
-        .narrative-section {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
-            max-width: 750px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* --- Typography & Animation States --- */
-        h1, p {
-            font-family: var(--font-serif);
-            font-size: clamp(1.6rem, 4vw, 2.5rem); /* Responsive font size */
-            line-height: 1.7;
-            margin: 1.5rem 0;
-            font-weight: 400;
-            text-shadow: 0 1px 5px rgba(0,0,0,0.2);
-        }
-
-        p {
-           font-size: clamp(1.25rem, 3vw, 1.9rem);
-        }
-
-        .reveal-on-scroll {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: opacity 1.5s cubic-bezier(0.19, 1, 0.22, 1), transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
-            will-change: opacity, transform;
-        }
-
-        .reveal-on-scroll.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* --- Act-Specific Styles --- */
-        #act-one h1, #act-one p {
-            font-style: italic;
-        }
-
-        #act-three {
-            color: var(--color-text-dark);
-        }
-        
-        #act-three .final-message {
-            font-style: italic;
-            margin-top: 5rem;
-            text-shadow: none;
-        }
-
-        /* --- Particle Canvas (Act II) --- */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
             top: 0;
             left: 0;
             z-index: 1;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
         }
-
-        /* --- Timeline Styles (Act III) --- */
-        .timeline-container {
+        #ui-container {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 600px;
-            margin-top: 4rem;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
         }
-
-        .timeline {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            justify-content: space-between;
-            position: relative;
+        .message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 10, 0.8);
+            border: 1px solid var(--color-glow);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 30px var(--color-glow);
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            line-height: 1.6;
         }
-
-        .timeline::before { /* The connecting line */
-            content: '';
+        .message-box.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .close-button {
             position: absolute;
             top: 10px;
-            left: 10%;
-            width: 80%;
-            height: 2px;
-            background-color: #d4af37; /* Brighter gold for the line */
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 2s cubic-bezier(0.25, 1, 0.5, 1);
-            z-index: -1;
-        }
-
-        .timeline-container.is-visible .timeline::before {
-            transform: scaleX(1);
-        }
-
-        .timeline-milestone {
-            text-align: center;
-            position: relative;
-            width: 30%;
-            opacity: 0;
-        }
-
-        .milestone-node {
-            width: 20px;
-            height: 20px;
-            background-color: white;
-            border-radius: 50%;
-            margin: 0 auto 1rem;
-            border: 4px solid var(--color-accent);
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            right: 15px;
+            font-size: 1.5rem;
             cursor: pointer;
+            color: var(--color-text);
         }
-
-        .timeline-milestone:hover .milestone-node {
-            transform: scale(1.3);
-            box-shadow: 0 0 15px var(--color-accent);
-        }
-        
-        .milestone-title {
-            font-family: var(--font-sans);
-            font-weight: 400;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-        }
-
-        .milestone-message {
+        .constellation-label {
             position: absolute;
-            bottom: 130%;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            background: white;
-            padding: 0.8rem 1.3rem;
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-            white-space: nowrap;
+            color: var(--color-accent);
             font-family: var(--font-serif);
-            font-style: italic;
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            color: var(--color-text-dark);
+            font-size: 1.2rem;
+            text-shadow: 0 0 8px var(--color-accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
         }
-
-        .timeline-milestone:hover .milestone-message {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-bg);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 1s ease 1s;
+        }
+        #loading-screen h1 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            color: var(--color-text);
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+        #loading-screen p {
+             font-family: var(--font-sans);
+             font-size: 1rem;
+             color: var(--color-text);
+             opacity: 0;
+             animation: fadeIn 2s 1s forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        #wish-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 20;
+        }
+        #wish-button {
+            background: none;
+            border: 1px solid var(--color-accent);
+            color: var(--color-accent);
+            font-family: var(--font-sans);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+            pointer-events: all;
+        }
+        #wish-button:hover {
+            background: var(--color-accent);
+            color: var(--color-bg);
+        }
+        #wish-modal {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 1rem;
+        }
+        #wish-modal textarea {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--color-glow);
+            color: var(--color-text);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: var(--font-sans);
+            width: 100%;
+            height: 100px;
+            resize: none;
+        }
+        #wish-modal button {
+            background: var(--color-accent);
+            border: none;
+            color: var(--color-bg);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+    <div id="loading-screen">
+        <h1>For Himani</h1>
+        <p>A universe of thoughts from Warun</p>
+    </div>
 
-    <div id="persistent-light"></div>
-    <div id="particles-js"></div>
+    <canvas id="bg"></canvas>
 
-    <main>
-        <!-- ACT I: The Apology -->
-        <section id="act-one" class="narrative-section">
-            <h1 id="typewriter" class="reveal-on-scroll"></h1>
-            <p class="reveal-on-scroll" data-delay="3000">For my thoughtlessness, I was wrong.</p>
-            <p class="reveal-on-scroll" data-delay="3500">There are no excuses.</p>
-            <p class="reveal-on-scroll" data-delay="4000">I let my own insecurity get the best of me. That is my failing, not yours.</p>
-            <p class="reveal-on-scroll" data-delay="4500">I promise to be more mindful and considerate. I am learning.</p>
-        </section>
+    <div id="ui-container">
+        <div id="message-box" class="message-box">
+            <span id="close-button" class="close-button">&times;</span>
+            <p id="message-content"></p>
+        </div>
+        
+        <div id="wish-container">
+            <button id="wish-button">Make a Wish</button>
+        </div>
 
-        <!-- ACT II: The Declaration -->
-        <section id="act-two" class="narrative-section">
-            <p class="reveal-on-scroll">My eyes are only for you, Himani.</p>
-            <p class="reveal-on-scroll" data-delay="500">Every time I breathe...</p>
-            <p class="reveal-on-scroll" data-delay="1000">...every heartbeat of mine...</p>
-            <p class="reveal-on-scroll" data-delay="1500">...is for you.</p>
-            <p class="reveal-on-scroll" data-delay="2000">My entire existence is for you.</p>
-        </section>
+        <div id="wish-modal" class="message-box">
+            <span id="close-wish-modal" class="close-button">&times;</span>
+            <h2>Write a Wish for Her Future</h2>
+            <textarea id="wish-input" placeholder="e.g., I wish you find all the happiness you deserve..."></textarea>
+            <button id="submit-wish">Add to the Stars</button>
+        </div>
+    </div>
 
-        <!-- ACT III: The Promise -->
-        <section id="act-three" class="narrative-section">
-            <div class="timeline-container reveal-on-scroll">
-                <ul class="timeline">
-                    <li class="timeline-milestone" id="milestone-1">
-                        <div class="milestone-node"></div>
-                        <div class="milestone-title">Your Dream University</div>
-                        <div class="milestone-message">I will always be rooting for you.</div>
-                    </li>
-                    <li class="timeline-milestone" id="milestone-2">
-                        <div class="milestone-node"></div>
-                        <div class="milestone-title">Your Dream Career</div>
-                        <div class="milestone-message">I will always be there to hold your hand...</div>
-                    </li>
-                    <li class="timeline-milestone" id="milestone-3">
-                        <div class="milestone-node"></div>
-                        <div class="milestone-title">Everything You Achieve</div>
-                        <div class="milestone-message">...and see you shine.</div>
-                    </li>
-                </ul>
-            </div>
-            <p class="final-message reveal-on-scroll" data-delay="1500">And I will wait. - Warun</p>
-        </section>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- Scene Setup ---
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.position.z = 50;
 
-            // --- INITIALIZATION ---
-            initScrollObserver();
-            initTypewriter();
-            initPersistentLight();
-            initTimelineAnimation();
-
-            /**
-             * Initializes IntersectionObservers for scroll-triggered animations and state changes.
-             */
-            function initScrollObserver() {
-                const revealElements = document.querySelectorAll('.reveal-on-scroll');
-                const sections = document.querySelectorAll('.narrative-section');
-                const light = document.getElementById('persistent-light');
-                const particleCanvas = document.getElementById('particles-js');
-                const body = document.body;
-
-                const revealObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const delay = parseInt(entry.target.dataset.delay || 0, 10);
-                            setTimeout(() => {
-                                entry.target.classList.add('is-visible');
-                            }, delay);
-                            revealObserver.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.1 });
-
-                revealElements.forEach(el => revealObserver.observe(el));
-
-                const sectionObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const currentAct = entry.target.id;
-                            body.style.backgroundColor = `var(--color-${currentAct}-bg)`;
-
-                            switch (currentAct) {
-                                case 'act-one':
-                                    light.dataset.state = 'pulse';
-                                    particleCanvas.style.opacity = '0';
-                                    break;
-                                case 'act-two':
-                                    if (!window.particlesInited) {
-                                        initParticleField();
-                                        window.particlesInited = true;
-                                    }
-                                    particleCanvas.style.opacity = '0.3';
-                                    light.dataset.state = 'follow';
-                                    break;
-                                case 'act-three':
-                                    light.dataset.state = 'guide';
-                                    particleCanvas.style.opacity = '0';
-                                    break;
-                            }
-                        }
-                    });
-                }, { rootMargin: "-50% 0px -50% 0px" });
-
-                sections.forEach(sec => sectionObserver.observe(sec));
+            // --- UI Elements ---
+            const messageBox = document.getElementById('message-box');
+            const messageContent = document.getElementById('message-content');
+            const closeButton = document.getElementById('close-button');
+            const wishButton = document.getElementById('wish-button');
+            const wishModal = document.getElementById('wish-modal');
+            const closeWishModal = document.getElementById('close-wish-modal');
+            const wishInput = document.getElementById('wish-input');
+            const submitWish = document.getElementById('submit-wish');
+            
+            // --- Star Creation ---
+            const starGeometry = new THREE.BufferGeometry();
+            const starVertices = [];
+            for (let i = 0; i < 10000; i++) {
+                const x = (Math.random() - 0.5) * 2000;
+                const y = (Math.random() - 0.5) * 2000;
+                const z = (Math.random() - 0.5) * 2000;
+                starVertices.push(x, y, z);
             }
+            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+            const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+            const stars = new THREE.Points(starGeometry, starMaterial);
+            scene.add(stars);
 
-            /**
-             * Creates a typewriter effect for the opening message.
-             */
-            function initTypewriter() {
-                const target = document.getElementById('typewriter');
-                const text = "I'm sorry, Himani.";
-                let i = 0;
-                target.innerHTML = ''; 
+            // --- Interactive Constellations ---
+            const interactiveObjects = [];
+            const constellationGroup = new THREE.Group();
+            scene.add(constellationGroup);
 
-                function type() {
-                    if (i < text.length) {
-                        target.innerHTML += text.charAt(i);
-                        i++;
-                        setTimeout(type, 150); // Slowed down for more gravitas
+            const constellations = {
+                apology: {
+                    name: "The Apology",
+                    center: new THREE.Vector3(-30, 10, 0),
+                    stars: [
+                        { pos: new THREE.Vector3(0, 0, 0), msg: "I was wrong, Himani. For my thoughtlessness, I am truly sorry." },
+                        { pos: new THREE.Vector3(2, 2, 0), msg: "My insecurity spoke for me, and I deeply regret the words it chose." },
+                        { pos: new THREE.Vector3(-2, 3, 0), msg: "There are no excuses, only my sincere promise to be better." }
+                    ]
+                },
+                declaration: {
+                    name: "The Declaration",
+                    center: new THREE.Vector3(30, 15, 0),
+                    stars: [
+                        { pos: new THREE.Vector3(0, 0, 0), msg: "My eyes are only for you." },
+                        { pos: new THREE.Vector3(-3, -2, 0), msg: "Every heartbeat of mine thinks about you." },
+                        { pos: new THREE.Vector3(1, -4, 0), msg: "My entire existence is drawn to you, like a star to the center of its galaxy." }
+                    ]
+                },
+                promise: {
+                    name: "The Promise",
+                    center: new THREE.Vector3(0, -20, 0),
+                    stars: [
+                        { pos: new THREE.Vector3(0, 0, 0), msg: "Whatever path you choose..." },
+                        { pos: new THREE.Vector3(3, 1, 0), msg: "...to your dream university and your dream career..." },
+                        { pos: new THREE.Vector3(6, 0, 0), msg: "...I will always be there, rooting for you and holding your hand." }
+                    ]
+                }
+            };
+
+            const starTexture = new THREE.TextureLoader().load('https://placehold.co/32x32/ffffff/ffffff.png');
+            Object.values(constellations).forEach(c => {
+                c.stars.forEach(s => {
+                    const starSpriteMaterial = new THREE.SpriteMaterial({ map: starTexture, color: 0xa77cff, transparent: true, opacity: 0.8, sizeAttenuation: true });
+                    const starSprite = new THREE.Sprite(starSpriteMaterial);
+                    starSprite.position.copy(c.center).add(s.pos);
+                    starSprite.scale.set(2, 2, 1);
+                    starSprite.userData.message = s.msg;
+                    starSprite.userData.isInteractive = true;
+                    constellationGroup.add(starSprite);
+                    interactiveObjects.push(starSprite);
+                });
+            });
+
+            // --- Raycasting for Interactivity ---
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            function onMouseMove(event) {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            }
+            window.addEventListener('mousemove', onMouseMove, false);
+
+            function onMouseClick(event) {
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(interactiveObjects);
+                if (intersects.length > 0) {
+                    const obj = intersects[0].object;
+                    if (obj.userData.isInteractive && obj.userData.message) {
+                        messageContent.textContent = obj.userData.message;
+                        messageBox.classList.add('visible');
+                        
+                        // Zoom to star
+                        new TWEEN.Tween(camera.position)
+                            .to({ x: obj.position.x, y: obj.position.y, z: obj.position.z + 10 }, 1000)
+                            .easing(TWEEN.Easing.Quadratic.InOut)
+                            .start();
                     }
                 }
-                
-                const observer = new IntersectionObserver((entries, obs) => {
-                    if (entries[0].isIntersecting) {
-                        setTimeout(type, 1500); // Increased delay before typing starts
-                        obs.disconnect();
-                    }
-                });
-                observer.observe(target);
             }
+            window.addEventListener('click', onMouseClick, false);
 
-            /**
-             * Manages the 'Persistent Light' with a smooth, lagging follow effect.
-             */
-            function initPersistentLight() {
-                const light = document.getElementById('persistent-light');
-                let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-                let lightPos = { x: mouse.x, y: mouse.y };
-                const easing = 0.08; // Controls the lag amount
+            // --- UI Logic ---
+            closeButton.addEventListener('click', () => {
+                messageBox.classList.remove('visible');
+                // Zoom back out
+                new TWEEN.Tween(camera.position)
+                    .to({ x: 0, y: 0, z: 50 }, 1000)
+                    .easing(TWEEN.Easing.Quadratic.InOut)
+                    .start();
+            });
 
-                window.addEventListener('mousemove', (e) => {
-                    mouse.x = e.clientX;
-                    mouse.y = e.clientY;
-                });
-                
-                function animateLight() {
-                    // Calculate the distance to the target
-                    const dx = mouse.x - lightPos.x;
-                    const dy = mouse.y - lightPos.y;
+            wishButton.addEventListener('click', () => {
+                wishModal.style.display = 'flex';
+                wishModal.classList.add('visible');
+            });
 
-                    // Apply easing to smoothly move the light
-                    lightPos.x += dx * easing;
-                    lightPos.y += dy * easing;
+            closeWishModal.addEventListener('click', () => {
+                wishModal.classList.remove('visible');
+                setTimeout(() => wishModal.style.display = 'none', 500);
+            });
+            
+            submitWish.addEventListener('click', () => {
+                const wishText = wishInput.value;
+                if (wishText) {
+                    // Create a new star for the wish
+                    const wishStarMaterial = new THREE.SpriteMaterial({ map: starTexture, color: 0xffb7c5, transparent: true, opacity: 1 });
+                    const wishStar = new THREE.Sprite(wishStarMaterial);
+                    wishStar.position.set(Math.random() * 20 - 10, -10 + Math.random() * 5, 0);
+                    wishStar.scale.set(2.5, 2.5, 1);
+                    wishStar.userData.message = `Warun's wish for you: "${wishText}"`;
+                    wishStar.userData.isInteractive = true;
+                    constellationGroup.add(wishStar);
+                    interactiveObjects.push(wishStar);
                     
-                    if (light.dataset.state === 'follow') {
-                        light.style.opacity = '1';
-                        light.style.transform = `translate(${lightPos.x}px, ${lightPos.y}px)`;
-                    } else {
-                        light.style.opacity = '0';
-                    }
-                    requestAnimationFrame(animateLight);
-                }
-                animateLight();
-            }
+                    // Animate the wish star
+                    wishStar.scale.set(0,0,0);
+                    new TWEEN.Tween(wishStar.scale)
+                        .to({x: 2.5, y: 2.5, z: 1}, 2000)
+                        .easing(TWEEN.Easing.Elastic.Out)
+                        .start();
 
-            /**
-             * Initializes the particle.js background for Act II.
-             */
-            function initParticleField() {
-                if (window.particlesJS) {
-                    particlesJS('particles-js', {
-                        "particles": {
-                            "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
-                            "color": { "value": "#ffffff" },
-                            "shape": { "type": "circle" },
-                            "opacity": { "value": 0.4, "random": true, "anim": { "enable": true, "speed": 0.5, "opacity_min": 0.1, "sync": false } },
-                            "size": { "value": 2, "random": true },
-                            "line_linked": { "enable": false },
-                            "move": { "enable": true, "speed": 0.4, "direction": "none", "random": true, "straight": false, "out_mode": "out" }
-                        },
-                        "interactivity": { "detect_on": "window", "events": { "onhover": { "enable": true, "mode": "bubble" } }, "modes": { "bubble": { "distance": 250, "size": 4, "duration": 2, "opacity": 0.8 } } },
-                        "retina_detect": true
-                    });
+                    closeWishModal.click();
+                    wishInput.value = '';
+                    wishButton.style.display = 'none'; // Only one wish
                 }
-            }
+            });
 
-            /**
-             * Uses Anime.js for a more dynamic timeline animation.
-             */
-            function initTimelineAnimation() {
-                const timelineContainer = document.querySelector('.timeline-container');
-                const observer = new IntersectionObserver((entries, obs) => {
-                    if (entries[0].isIntersecting) {
-                        entries[0].target.classList.add('is-visible');
-                        anime({
-                            targets: '.timeline-milestone',
-                            opacity: [0, 1],
-                            translateY: [50, 0],
-                            // Using a spring physics based easing for a more natural feel
-                            easing: 'spring(1, 80, 10, 0)',
-                            delay: anime.stagger(300, { start: 800 })
-                        });
-                        obs.disconnect();
-                    }
-                }, { threshold: 0.2 });
-
-                if (timelineContainer) {
-                    observer.observe(timelineContainer);
-                }
+            // --- Animation Loop ---
+            function animate() {
+                requestAnimationFrame(animate);
+                TWEEN.update();
+                stars.rotation.y += 0.0001;
+                constellationGroup.rotation.y += 0.0002;
+                renderer.render(scene, camera);
             }
+            
+            // --- Initial Load ---
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.addEventListener('transitionend', () => {
+                loadingScreen.style.display = 'none';
+            });
+            window.onload = () => {
+                loadingScreen.style.opacity = '0';
+                animate();
+            };
+
+            // --- Resize Handling ---
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
         });
     </script>
 </body>
