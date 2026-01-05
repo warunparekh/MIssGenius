@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Universe for Hitti (Future CA)</title>
+    <title>Hitti's Universe (CA Edition)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Quicksand:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --font-serif: 'Cormorant Garamond', serif;
             --font-sans: 'Quicksand', sans-serif;
             --color-bg: #00000a;
-            --color-text: #e0e0e0;
-            --color-glow: #a77cff;
-            --color-accent: #ffb7c5;
+            --color-text: #edf2f4;
+            --color-glow: #9d4edd; /* Deeper Purple */
+            --color-accent: #ff9e00; /* Gold/Orange for hype */
+            --color-soft: #ffc8dd; /* Soft pink for supportive notes */
         }
         body {
             margin: 0;
@@ -45,35 +46,45 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 10, 0.85);
-            border: 1px solid var(--color-glow);
-            border-radius: 15px;
-            padding: 2.5rem;
-            max-width: 450px;
+            /* Stronger glass effect */
+            background: rgba(10, 10, 25, 0.75);
+            border: 1px solid rgba(157, 78, 221, 0.5);
+            border-radius: 20px;
+            padding: 3rem;
+            min-width: 300px;
+            max-width: 500px;
             text-align: center;
             opacity: 0;
-            transition: opacity 0.5s ease;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 0 30px rgba(167, 124, 255, 0.3);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 0 40px rgba(157, 78, 221, 0.2);
             font-family: var(--font-serif);
-            font-size: 1.4rem;
-            line-height: 1.6;
+            font-size: 1.6rem;
+            line-height: 1.5;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
         .message-box.visible {
             opacity: 1;
             pointer-events: all;
+            transform: translate(-50%, -50%) scale(1);
         }
         .close-button {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 1.5rem;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
             cursor: pointer;
             color: var(--color-text);
-            transition: color 0.3s;
+            opacity: 0.7;
+            transition: all 0.3s;
+            line-height: 1;
         }
         .close-button:hover {
+            opacity: 1;
             color: var(--color-accent);
+            transform: rotate(90deg);
         }
         #loading-screen {
             position: fixed;
@@ -81,32 +92,36 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--color-bg);
+            background: radial-gradient(circle at center, #1a1a2e 0%, #00000a 100%);
             z-index: 100;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            transition: opacity 1s ease 1s;
+            transition: opacity 1.5s ease 0.5s;
         }
         #loading-screen h1 {
             font-family: var(--font-serif);
-            font-size: 2.5rem;
-            color: var(--color-text);
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, var(--color-text), var(--color-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             opacity: 0;
-            animation: fadeIn 2s forwards;
+            animation: fadeInDown 2s forwards;
             margin-bottom: 10px;
         }
         #loading-screen p {
              font-family: var(--font-sans);
-             font-size: 1.1rem;
-             color: var(--color-glow);
+             font-size: 1.2rem;
+             color: var(--color-soft);
              opacity: 0;
-             animation: fadeIn 2s 1s forwards;
+             animation: fadeInUp 2s 0.5s forwards;
+             letter-spacing: 2px;
+             text-transform: uppercase;
         }
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
         #wish-container {
             position: absolute;
             bottom: 30px;
@@ -114,85 +129,97 @@
             z-index: 20;
         }
         #wish-button {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid var(--color-accent);
+            background: rgba(0,0,0,0.6);
+            border: 2px solid var(--color-accent);
             color: var(--color-accent);
             font-family: var(--font-sans);
-            padding: 12px 24px;
-            border-radius: 30px;
+            padding: 12px 30px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             pointer-events: all;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            box-shadow: 0 0 10px rgba(255, 158, 0, 0.2);
         }
         #wish-button:hover {
             background: var(--color-accent);
             color: var(--color-bg);
-            box-shadow: 0 0 15px var(--color-accent);
+            box-shadow: 0 0 30px var(--color-accent);
+            transform: translateY(-3px);
         }
         #wish-modal {
             display: none; 
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
+            border-color: var(--color-accent);
         }
         #wish-modal h2 {
             margin-top: 0;
-            font-size: 1.8rem;
+            font-size: 2rem;
             color: var(--color-accent);
+            font-family: var(--font-serif);
         }
         #wish-modal textarea {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--color-glow);
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: var(--color-text);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 15px;
             font-family: var(--font-sans);
-            font-size: 1rem;
+            font-size: 1.1rem;
             width: 100%;
-            height: 100px;
+            height: 120px;
             resize: none;
             box-sizing: border-box;
+            transition: border-color 0.3s;
         }
         #wish-modal textarea:focus {
             outline: none;
             border-color: var(--color-accent);
         }
         #wish-modal button {
-            background: var(--color-glow);
+            background: linear-gradient(45deg, var(--color-accent), #ff7b00);
             border: none;
             color: white;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 12px;
             cursor: pointer;
             font-family: var(--font-sans);
             font-weight: bold;
-            transition: background 0.3s;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         #wish-modal button:hover {
-            background: var(--color-accent);
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 158, 0, 0.4);
         }
         .instruction {
             position: absolute;
-            bottom: 30px;
-            left: 30px;
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.5);
+            bottom: 40px;
+            left: 40px;
+            font-size: 1rem;
+            color: var(--color-soft);
             pointer-events: none;
+            opacity: 0.7;
+            font-weight: 600;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
     <div id="loading-screen">
-        <h1>For Hitti</h1>
-        <p>A universe of luck for the Future CA</p>
+        <h1>Hitti's Universe</h1>
+        <p>Loading encouragement for the future CA...</p>
     </div>
 
     <canvas id="bg"></canvas>
 
     <div id="ui-container">
-        <div class="instruction">Click on the glowing purple stars...</div>
+        <div class="instruction">Explore the glowing stars...</div>
 
         <div id="message-box" class="message-box">
             <span id="close-button" class="close-button">&times;</span>
@@ -200,14 +227,14 @@
         </div>
         
         <div id="wish-container">
-            <button id="wish-button">Send Good Luck</button>
+            <button id="wish-button">Manifest Success</button>
         </div>
 
         <div id="wish-modal" class="message-box">
             <span id="close-wish-modal" class="close-button">&times;</span>
-            <h2>Manifest It</h2>
-            <textarea id="wish-input" placeholder="Write a wish for her exams or future..."></textarea>
-            <button id="submit-wish">Cast to the Stars</button>
+            <h2>Send a Good Vibe</h2>
+            <textarea id="wish-input" placeholder="E.g., 'You're going to crush that Audit paper!'"></textarea>
+            <button id="submit-wish">Launch Wish</button>
         </div>
     </div>
 
@@ -215,41 +242,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Helper: Create Round Star Texture ---
-            function createStarTexture() {
+            
+            // --- Texture Generation for beautiful stars ---
+            function createStarTexture(color1, color2) {
                 const canvas = document.createElement('canvas');
-                canvas.width = 64;
-                canvas.height = 64;
+                canvas.width = 64; canvas.height = 64;
                 const ctx = canvas.getContext('2d');
-                
-                // Draw a radial gradient (glow)
-                const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-                gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-                gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
-                gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
-                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                
+                const gradient = ctx.createRadialGradient(32, 32, 2, 32, 32, 32);
+                gradient.addColorStop(0, 'rgba(255,255,255,1)');
+                gradient.addColorStop(0.3, color1); // Inner glow
+                gradient.addColorStop(1, color2); // Outer fade
                 ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, 64, 64);
-                
-                const texture = new THREE.CanvasTexture(canvas);
-                return texture;
+                ctx.fillRect(0,0,64,64);
+                return new THREE.CanvasTexture(canvas);
             }
-
-            const starTexture = createStarTexture();
+            
+            const mainStarTexture = createStarTexture('rgba(157, 78, 221, 0.8)', 'rgba(0,0,0,0)'); // Purple glow
+            const wishStarTexture = createStarTexture('rgba(255, 158, 0, 0.8)', 'rgba(0,0,0,0)'); // Gold glow
 
             // --- Scene Setup ---
             const scene = new THREE.Scene();
-            // Add slight fog for depth
-            scene.fog = new THREE.FogExp2(0x00000a, 0.001);
-
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-            const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true, alpha: true });
+            scene.fog = new THREE.FogExp2(0x00000a, 0.0008); // Subtle fog
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
+            const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            camera.position.z = 50;
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap pixel ratio for performance
+            camera.position.z = 100;
 
-            // --- UI Elements ---
+            // --- UI Ref ---
             const messageBox = document.getElementById('message-box');
             const messageContent = document.getElementById('message-content');
             const closeButton = document.getElementById('close-button');
@@ -259,157 +279,227 @@
             const wishInput = document.getElementById('wish-input');
             const submitWish = document.getElementById('submit-wish');
             
-            // --- Background Star Field (Increased Count) ---
-            const starGeometry = new THREE.BufferGeometry();
-            const starVertices = [];
-            
-            // Increased to 15,000 stars
-            for (let i = 0; i < 15000; i++) {
-                const x = (Math.random() - 0.5) * 2500;
-                const y = (Math.random() - 0.5) * 2500;
-                const z = (Math.random() - 0.5) * 2500;
-                starVertices.push(x, y, z);
+            // --- VISUAL UPGRADE: Colorful Background Stars ---
+            const bgStarGeometry = new THREE.BufferGeometry();
+            const bgStarCount = 15000;
+            const bgPositions = new Float32Array(bgStarCount * 3);
+            const bgColors = new Float32Array(bgStarCount * 3);
+            const bgSizes = new Float32Array(bgStarCount);
+
+            const colorPalette = [
+                new THREE.Color(0xffffff), // White
+                new THREE.Color(0xa77cff), // Purple
+                new THREE.Color(0x80bdff), // Blue
+                new THREE.Color(0xffc8dd)  // Soft Pink
+            ];
+
+            for (let i = 0; i < bgStarCount; i++) {
+                const i3 = i * 3;
+                // Spread stars far out
+                bgPositions[i3] = (Math.random() - 0.5) * 4000;
+                bgPositions[i3 + 1] = (Math.random() - 0.5) * 4000;
+                bgPositions[i3 + 2] = (Math.random() - 0.5) * 4000;
+                
+                // Assign random color from palette
+                const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                bgColors[i3] = color.r;
+                bgColors[i3+1] = color.g;
+                bgColors[i3+2] = color.b;
+
+                bgSizes[i] = Math.random() * 2; // Random base sizes
             }
-            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-            
-            // Use the custom texture and transparency
-            const starMaterial = new THREE.PointsMaterial({ 
-                map: starTexture,
-                color: 0xffffff, 
-                size: 0.7, // Base size
-                transparent: true,
-                opacity: 0.8,
-                sizeAttenuation: true,
+            bgStarGeometry.setAttribute('position', new THREE.BufferAttribute(bgPositions, 3));
+            bgStarGeometry.setAttribute('color', new THREE.BufferAttribute(bgColors, 3));
+            bgStarGeometry.setAttribute('size', new THREE.BufferAttribute(bgSizes, 1));
+
+            // Custom shader material for twinkling effect
+            const bgStarMaterial = new THREE.PointsMaterial({
+                size: 1.5,
+                vertexColors: true,
+                map: createStarTexture('rgba(255,255,255,0.5)','rgba(0,0,0,0)'),
+                blending: THREE.AdditiveBlending,
                 depthWrite: false,
-                blending: THREE.AdditiveBlending
+                transparent: true,
+                sizeAttenuation: true
             });
             
-            const stars = new THREE.Points(starGeometry, starMaterial);
-            scene.add(stars);
+            const bgStars = new THREE.Points(bgStarGeometry, bgStarMaterial);
+            scene.add(bgStars);
 
-            // --- Interactive Constellations (Friendship/CA Theme) ---
+            // --- CONTENT EXPANSION: 20+ Interactive Messages ---
             const interactiveObjects = [];
             const constellationGroup = new THREE.Group();
             scene.add(constellationGroup);
 
-            const constellations = {
-                ambition: {
-                    name: "The Grind",
-                    center: new THREE.Vector3(-30, 10, -10),
-                    stars: [
-                        { pos: new THREE.Vector3(0, 0, 0), msg: "I know the syllabus feels infinite, but your potential is bigger." },
-                        { pos: new THREE.Vector3(3, 2, 0), msg: "Every late night and every sacrifice is building your empire." },
-                        { pos: new THREE.Vector3(-2, 4, 0), msg: "Balance sheets might be tough, but you are tougher." }
+            // Data structure for messages grouped by theme (constellations)
+            const constellationsData = [
+                {
+                    name: "The Reality Check", center: {x: -50, y: 30, z: -20},
+                    messages: [
+                        "It's okay to cry over Tax. We've all been there.",
+                        "Sleep is not a weakness, Hitti. Go to bed.",
+                        "Coffee is practically a food group at this point, right?",
+                        "If you feel like quitting, remember why you started."
                     ]
                 },
-                friendship: {
-                    name: "The Bond",
-                    center: new THREE.Vector3(35, 15, 0),
-                    stars: [
-                        { pos: new THREE.Vector3(0, 0, 0), msg: "No matter what happens in the exam hall, I am proud of you." },
-                        { pos: new THREE.Vector3(-3, -2, 0), msg: "You're not just my best friend; you're the smartest person I know." },
-                        { pos: new THREE.Vector3(2, -4, 0), msg: "I'll be right here waiting to celebrate (or just eat pizza) when you're done." }
+                {
+                    name: "The Hype Zone", center: {x: 60, y: 20, z: 0},
+                    messages: [
+                        "Future CA Hitti in the house! Make way!",
+                        "That signature of yours is going to look EXPENSIVE.",
+                        "You are smarter than this syllabus. Fact.",
+                        "Your potential is bigger than any textbook."
                     ]
                 },
-                support: {
-                    name: "The Promise",
-                    center: new THREE.Vector3(0, -20, 5),
-                    stars: [
-                        { pos: new THREE.Vector3(0, 0, 0), msg: "Take a deep breath. You've got this." },
-                        { pos: new THREE.Vector3(4, 1, 0), msg: "Stress is temporary. That 'CA' prefix is forever." },
-                        { pos: new THREE.Vector3(7, -1, 0), msg: "Go crush it, Hitti. Warun is rooting for you!" }
+                {
+                    name: "The Post-Exam Dream", center: {x: 0, y: -50, z: 30},
+                    messages: [
+                        "I'm already planning the 'freedom' party.",
+                        "Visualize the moment you walk out of that last exam hall.",
+                        "We are eating ALL the food when this is over. My treat.",
+                        "Just think: soon Netflix without guilt."
+                    ]
+                },
+                {
+                    name: "The Best Friend Corner", center: {x: -70, y: -30, z: 10},
+                    messages: [
+                        "Warun is insanely proud of you, no matter what the marksheet says.",
+                        "Sending you my extra brain cells for the tough chapters.",
+                        "You're not alone in this library of stress. I'm virtually there.",
+                        "Don't forget to breathe. Seriously, inhale now."
+                    ]
+                },
+                 {
+                    name: "The Final Push", center: {x: 40, y: 60, z: -40},
+                    messages: [
+                        "Eyes on the prize. One chapter at a time.",
+                        "Trust your preparation. You know more than you think.",
+                        "This stress is temporary. The 'CA' prefix is forever.",
+                    ]
+                },
+                 {
+                    name: "The Inner Strength", center: {x: 20, y: 0, z: 80},
+                    messages: [
+                        "You have survived 100% of your bad days so far.",
+                        "Your resilience is inspiring.",
+                        "Keep grinding, keep shining.",
                     ]
                 }
-            };
+            ];
 
-            Object.values(constellations).forEach(c => {
-                c.stars.forEach(s => {
+            // Function to generate the interactive stars based on data
+            const spreadRadius = 25; // How far stars spread from their constellation center
+            
+            constellationsData.forEach(cData => {
+                const center = new THREE.Vector3(cData.center.x, cData.center.y, cData.center.z);
+                
+                cData.messages.forEach((msg, index) => {
                     const spriteMaterial = new THREE.SpriteMaterial({ 
-                        map: starTexture, 
-                        color: 0xa77cff, // Purple glow for interactive stars
+                        map: mainStarTexture, 
+                        color: 0xffffff,
                         transparent: true, 
                         opacity: 0.9, 
-                        blending: THREE.AdditiveBlending
+                        blending: THREE.AdditiveBlending,
+                        depthTest: false // Ensures they always glow on top
                     });
-                    const starSprite = new THREE.Sprite(spriteMaterial);
-                    starSprite.position.copy(c.center).add(s.pos);
-                    starSprite.scale.set(3, 3, 1); // Make these stars bigger
-                    starSprite.userData.message = s.msg;
-                    starSprite.userData.isInteractive = true;
                     
-                    // Add a subtle pulse animation data
-                    starSprite.userData.randomPhase = Math.random() * Math.PI;
+                    const starSprite = new THREE.Sprite(spriteMaterial);
+                    
+                    // Position randomly around the center point
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.acos((Math.random() * 2) - 1);
+                    const r = Math.random() * spreadRadius + 5;
+                    
+                    starSprite.position.set(
+                        center.x + r * Math.sin(phi) * Math.cos(theta),
+                        center.y + r * Math.sin(phi) * Math.sin(theta),
+                        center.z + r * Math.cos(phi)
+                    );
+
+                    // Varying sizes for more organic look
+                    const baseScale = 4 + Math.random() * 3;
+                    starSprite.scale.set(baseScale, baseScale, 1); 
+                    
+                    starSprite.userData = {
+                        message: msg,
+                        isInteractive: true,
+                        baseScale: baseScale,
+                        randomPhase: Math.random() * Math.PI * 2 // For pulsing animation
+                    };
                     
                     constellationGroup.add(starSprite);
                     interactiveObjects.push(starSprite);
-                    
-                    // Add connecting lines for effect (optional visual polish)
-                    if (s !== c.stars[0]) {
-                        const points = [];
-                        points.push(c.center.clone().add(c.stars[0].pos)); // Connect to center star
-                        points.push(c.center.clone().add(s.pos));
-                        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-                        const material = new THREE.LineBasicMaterial({ color: 0xa77cff, transparent: true, opacity: 0.2 });
-                        const line = new THREE.Line(geometry, material);
-                        constellationGroup.add(line);
+
+                    // Optional: Draw subtle lines connecting stars in the same group
+                    if (index > 0) {
+                         const prevStarPos = interactiveObjects[interactiveObjects.length-2].position;
+                         const points = [prevStarPos, starSprite.position];
+                         const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+                         const lineMat = new THREE.LineBasicMaterial({ color: 0x9d4edd, transparent: true, opacity: 0.15 });
+                         constellationGroup.add(new THREE.Line(lineGeo, lineMat));
                     }
                 });
             });
 
-            // --- Raycasting for Interactivity ---
+            // --- Raycasting ---
             const raycaster = new THREE.Raycaster();
+            raycaster.params.Points.threshold = 5; // Easier to click
             const mouse = new THREE.Vector2();
 
-            function onMouseMove(event) {
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            }
-            window.addEventListener('mousemove', onMouseMove, false);
-
             function onMouseClick(event) {
-                // Update mouse coordinates for click specifically (fixes mobile issues)
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                event.preventDefault();
+                // Handle both touch and mouse coord normalization
+                let clientX = event.clientX || (event.touches && event.touches[0].clientX);
+                let clientY = event.clientY || (event.touches && event.touches[0].clientY);
+                
+                if(clientX === undefined) return;
+
+                mouse.x = (clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
                 raycaster.setFromCamera(mouse, camera);
                 const intersects = raycaster.intersectObjects(interactiveObjects);
                 
                 if (intersects.length > 0) {
                     const obj = intersects[0].object;
-                    if (obj.userData.isInteractive && obj.userData.message) {
+                    if (obj.userData.isInteractive) {
                         messageContent.textContent = obj.userData.message;
                         messageBox.classList.add('visible');
                         
-                        // Zoom to star
+                        // Smooth zoom to star
+                        const targetPos = obj.position.clone();
+                        const direction = targetPos.clone().sub(camera.position).normalize();
+                        // Stop a bit in front of the star
+                        const endPos = targetPos.sub(direction.multiplyScalar(20));
+
                         new TWEEN.Tween(camera.position)
-                            .to({ x: obj.position.x, y: obj.position.y, z: obj.position.z + 12 }, 1500)
+                            .to({ x: endPos.x, y: endPos.y, z: endPos.z }, 1800)
                             .easing(TWEEN.Easing.Cubic.Out)
                             .start();
+                        
+                        // Make the clicked star burst briefly
+                        new TWEEN.Tween(obj.scale)
+                            .to({x: obj.userData.baseScale * 2, y: obj.userData.baseScale * 2}, 300)
+                            .yoyo(true).repeat(1).start();
                     }
                 }
             }
             window.addEventListener('click', onMouseClick, false);
-            // Handle touch for mobile
-            window.addEventListener('touchstart', (e) => {
-                 mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
-                 mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
-                 onMouseClick(e.touches[0]);
-            }, {passive: false});
+            window.addEventListener('touchstart', onMouseClick, {passive: false});
 
 
             // --- UI Logic ---
             closeButton.addEventListener('click', () => {
                 messageBox.classList.remove('visible');
-                // Zoom back out
+                // Zoom back to wide view
                 new TWEEN.Tween(camera.position)
-                    .to({ x: 0, y: 0, z: 50 }, 1500)
+                    .to({ x: 0, y: 0, z: 100 }, 2000)
                     .easing(TWEEN.Easing.Cubic.InOut)
                     .start();
             });
 
             wishButton.addEventListener('click', () => {
                 wishModal.style.display = 'flex';
-                // Small delay to allow display flex to apply before opacity transition
                 setTimeout(() => wishModal.classList.add('visible'), 10);
             });
 
@@ -421,36 +511,44 @@
             submitWish.addEventListener('click', () => {
                 const wishText = wishInput.value;
                 if (wishText) {
-                    // Create a new star for the wish
+                    // Create a special Gold/Orange star for the wish
                     const wishSpriteMaterial = new THREE.SpriteMaterial({ 
-                        map: starTexture, 
-                        color: 0xffb7c5, // Pink for wishes
-                        transparent: true, 
-                        opacity: 1,
-                        blending: THREE.AdditiveBlending
+                        map: wishStarTexture, 
+                        color: 0xffffff, 
+                        transparent: true, opacity: 1,
+                        blending: THREE.AdditiveBlending, depthTest: false
                     });
                     const wishStar = new THREE.Sprite(wishSpriteMaterial);
                     
-                    // Position it randomly near the center
-                    wishStar.position.set((Math.random() - 0.5) * 30, (Math.random() - 0.5) * 20, 10);
-                    wishStar.scale.set(0, 0, 0); // Start invisible
+                    // Position randomly near center
+                    wishStar.position.set((Math.random()-0.5)*60, (Math.random()-0.5)*40, (Math.random()-0.5)*20 + 20);
+                    wishStar.scale.set(0,0,0); // Start invisible
                     
-                    wishStar.userData.message = `Warun's wish for you: "${wishText}"`;
-                    wishStar.userData.isInteractive = true;
+                    wishStar.userData = {
+                        message: `Warun's manifestation for you: "${wishText}"`,
+                        isInteractive: true,
+                        baseScale: 8, // Bigger scale for wishes
+                        randomPhase: 0
+                    };
                     
                     constellationGroup.add(wishStar);
                     interactiveObjects.push(wishStar);
                     
-                    // Animate the wish star appearing
+                    // Dramatic entrance animation
                     new TWEEN.Tween(wishStar.scale)
-                        .to({x: 4, y: 4, z: 1}, 2000)
+                        .to({x: 8, y: 8, z: 1}, 2500)
                         .easing(TWEEN.Easing.Elastic.Out)
                         .start();
 
                     closeWishModal.click();
                     wishInput.value = '';
-                    wishButton.innerHTML = "Wish Sent!"; 
-                    setTimeout(() => wishButton.style.display = 'none', 2000);
+                    wishButton.innerHTML = "Wish Launched!";
+                    wishButton.style.background = "var(--color-accent)";
+                    wishButton.style.color = "var(--color-bg)";
+                    setTimeout(() => {
+                         wishButton.style.pointerEvents = "none";
+                         wishButton.style.opacity = 0;
+                    }, 2000);
                 }
             });
 
@@ -460,39 +558,50 @@
             function animate() {
                 requestAnimationFrame(animate);
                 const time = clock.getElapsedTime();
-
                 TWEEN.update();
                 
-                // Rotate background stars slowly
-                stars.rotation.y += 0.0001;
-                stars.rotation.z += 0.00005;
-                
-                // Rotate the message stars slightly differently
-                constellationGroup.rotation.y -= 0.0002;
+                // Slow, majestic rotation of the universe
+                bgStars.rotation.y += 0.00008;
+                bgStars.rotation.z -= 0.00004;
+                constellationGroup.rotation.y -= 0.00015;
+                constellationGroup.rotation.x += 0.00005;
 
-                // Make interactive stars pulse
+                // Twinkling background stars effect (manual shader simulation)
+                const sizes = bgStarGeometry.attributes.size.array;
+                for(let i=0; i < bgStarCount; i++) {
+                    // Use sin waves based on position and time to create varying twinkle
+                    sizes[i] = 1.5 + Math.sin(time * 2 + i) * 1.5 * Math.random();
+                }
+                bgStarGeometry.attributes.size.needsUpdate = true;
+
+                // Pulsing interactive stars
                 interactiveObjects.forEach(obj => {
-                    if(obj.userData.randomPhase) {
-                        const scaleBase = obj.userData.message.includes("Wish") ? 4 : 3;
-                        const scalePulse = Math.sin(time * 2 + obj.userData.randomPhase) * 0.3;
-                        obj.scale.setScalar(scaleBase + scalePulse);
+                    if(obj.userData.randomPhase !== undefined) {
+                        const pulse = Math.sin(time * 1.5 + obj.userData.randomPhase) * 0.2 + 1;
+                        obj.scale.set(
+                            obj.userData.baseScale * pulse, 
+                            obj.userData.baseScale * pulse, 
+                            1
+                        );
                     }
                 });
 
                 renderer.render(scene, camera);
             }
             
-            // --- Initial Load ---
+            // --- Loading & Resize ---
             const loadingScreen = document.getElementById('loading-screen');
             loadingScreen.addEventListener('transitionend', () => {
                 loadingScreen.style.display = 'none';
             });
             window.onload = () => {
-                loadingScreen.style.opacity = '0';
+                // Add a small delay for drama
+                setTimeout(() => {
+                    loadingScreen.style.opacity = '0';
+                }, 1500);
                 animate();
             };
 
-            // --- Resize Handling ---
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
